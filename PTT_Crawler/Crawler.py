@@ -1,31 +1,38 @@
 from selenium import webdriver
-import requests
+from bs4 import BeautifulSoup as soup
 import time
 import re
-from urllib.request import urlopen
-from bs4 import BeautifulSoup as soup
+import os
 
 url = 'https://www.ptt.cc/bbs'
 TABLES = str(input('欲選看版 : '))
-#html = urlopen(url)
-#soup1=soup(html,'html.parser')
 
-#print(soup1)
-#print("****************************************************")
+#####################################設置完整headers################################
+headers ={
+        'accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        'user-agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
+        'cookie':'__cfduid=d45c36e6b90991d9c214ae9a7f7542b391523876817; _ga=GA1.2.209739768.1523876819; _gid=GA1.2.480346404.1552660312; _gat=1'
+        }
 
-driver=webdriver.PhantomJS(executable_path='/home/rex/桌面/GliaCloud/phantomjs-2.1.1-linux-x86_64/bin/phantomjs')
+for key in headers:
+    webdriver.DesiredCapabilities.PHANTOMJS['phantomjs.page.customHeaders.{}'.format(key)] = headers[key]
+    
+driver = webdriver.PhantomJS(executable_path='/home/rex/桌面/GliaCloud/phantomjs-2.1.1-linux-x86_64/bin/phantomjs', service_log_path = os.path.devnull)
+####################################################################################
+
+####################################只設置userAgent#################################
+#from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+#dcap = dict(DesiredCapabilities.PHANTOMJS)
+#dcap["phantomjs.page.settings.userAgent"] = ('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36')
+#driver=webdriver.PhantomJS(executable_path='/home/rex/桌面/GliaCloud/phantomjs-2.1.1-linux-x86_64/bin/phantomjs', desired_capabilities = dcap)
+####################################################################################
+
 #driver = webdriver.Chrome(executable_path='/usr/local/share/chromedriver')
+#cookie = ';'.join(['{}={}'.format(item.get('name'),item.get('value')) for item in driver.get_cookies()])
+
 driver.get(url)
 
 driver.find_element_by_xpath("//div/a/div[text()='"+TABLES+"']").click()
-
-#time.sleep(2)
-
-
-headers = {
-        'user-agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
-        'cookie': '__cfduid=d45c36e6b90991d9c214ae9a7f7542b391523876817; _ga=GA1.2.209739768.1523876819; _gid=GA1.2.480346404.1552660312; _gat=1'
-        }
 
 
 def RE(content):
@@ -91,4 +98,5 @@ for i in range(0, len(article)):
         #print("ARTICLE : ", content)#article[i].find('a').attrs['href'])
 
 driver.quit()
+
 
